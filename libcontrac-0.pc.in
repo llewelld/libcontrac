@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_NAME@
+Description: A library for contact tracing.
+URL: https://www.flypig.co.uk/contrac
+Version: @VERSION@
+Libs: -L${libdir} -lcontrac
+Libs.private: -lz -lm 
+Cflags: -I${includedir} 
+
