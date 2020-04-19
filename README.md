@@ -1,12 +1,14 @@
 # libcontrac ReadMe
 
-libcontrac is an implementation of the Contact Traing API.
+libcontrac is an implementation of the Contact Tracing API.
+
+See the draft specs: https://www.apple.com/covid19/contacttracing/
 
 ## Install
 
 If you have autoconf you can install as follows.
 
-````
+```
 ./configure
 make
 make check
@@ -31,6 +33,7 @@ Most of the functionality revolves around the Conrac structure.
 
 Create and initialise the structure as follows. The day and interval number
 should be set appropriately.
+
 ```
 Contrac * contrac = contrac_new();
 contrac_generate_tracing_key(contrac);
