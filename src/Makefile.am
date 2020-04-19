@@ -1,7 +1,7 @@
 lib_LIBRARIES = ../libcontrac.a
 pkginclude_HEADERS = ../include/contrac/*.h
 
-___libcontrac_a_SOURCES = contrac.c
+___libcontrac_a_SOURCES = contrac.c rpi.c log.c utils.c dtk.c rpi_list.c dtk_list.c match.c
 ___libcontrac_a_CFLAGS = -std=gnu99 -fPIC -Wall -Werror -I"../include" @LIBCONTRAC_CFLAGS@
 ARFLAGS = cr
 AR_FLAGS = cr
