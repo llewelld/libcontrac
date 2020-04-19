@@ -272,7 +272,6 @@ START_TEST (check_match) {
 	Dtk * dtk;
 	MatchList * matches;
 	MatchListItem const * match;
-	int match_count;
 
 	// Generate some keys, check the results
 	Contrac * contrac;
@@ -321,7 +320,6 @@ START_TEST (check_match) {
 
 	match = match_list_first(matches);
 	
-	match_count = 0;
 	while (match) {
 		result = false;
 		for (pos = 0; pos < 4; ++pos) {
@@ -332,10 +330,9 @@ START_TEST (check_match) {
 
 		ck_assert(result);
 
-		match_count++;
 		match = match_list_next(match);
 	}
-	ck_assert_int_eq(match_count, 4);
+	ck_assert_int_eq(match_list_count(matches), 4);
 
 	// Clean up
 	match_list_delete(matches);
