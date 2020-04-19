@@ -1,7 +1,7 @@
 EXTRA_DIST = include/contrac
 
 SUBDIRS = src tests
-dist_doc_DATA = AUTHORS ChangeLog COPYING INSTALL NEWS README
+dist_doc_DATA = AUTHORS ChangeLog COPYING INSTALL NEWS README.md
 
 # Install the pkg-config file; the directory is set using
 # PKG_INSTALLDIR in configure.ac.

@@ -1,0 +1,73 @@
+# Object files
+*.o
+*.def
+*.exp
+
+# Libraries
+*.lib
+*.a
+.libs/
+/libcontrac-0.pc
+/libtool
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+*.lo
+*.la
+
+# Executables
+*.exe
+*.out
+*.app
+*.pyc
+/tests/test_contrac
+
+# autoconf
+
+/autom4te.cache/
+/.dirstamp
+Makefile
+Makefile.in
+/assets/Makefile
+/assets/icons/Makefile
+/config.h
+/config.log
+/config.status
+/knot3d
+/debian/knot3d.debhelper.log
+/debian/knot3d/
+/src/Makefile
+/stamp-h1
+.deps/
+/config/
+/m4/
+/doxyfile
+configure
+aclocal.m4
+config.h.in
+
+# Tests
+tests/*.log
+tests/*.trs
+
+# Specific files
+.knot.xml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

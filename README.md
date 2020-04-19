@@ -1,6 +1,6 @@
 # libcontrac ReadMe
 
-libcontrac is an implementation of the Contact Tracing API.
+libcontrac is an implementation of the Apple/Google Contact Tracing API.
 
 See the draft specs: https://www.apple.com/covid19/contacttracing/
 
@@ -9,7 +9,7 @@ See the draft specs: https://www.apple.com/covid19/contacttracing/
 If you have autoconf you can install as follows.
 
 ```
-autoconf --install
+autoreconf --install
 ./configure
 make
 make check
