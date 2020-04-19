@@ -15,13 +15,13 @@ autoreconf --install
 
 make
 
-4. Install application (usually has to be done as root):
-
-sudo make install
-
-5. Run the tests:
+4. Run the tests:
 
 make check
+
+5. Install application (usually has to be done as root):
+
+sudo make install
 
 6. To create the debian package:
 

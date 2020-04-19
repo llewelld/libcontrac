@@ -10,14 +10,16 @@ If you have autoconf you should be able to install using the following 3 command
 
 ./configure
 make
+make check
 make install
 
 
-License
+Licence
 =======
 
-Read COPYING for information on the license. libcontrac is released under the MIT License.
+Copyright (c) David Llewellyn-Jones, 2020
 
+libcontrac is released under the GPL v2 Licence. Read COPYING for information on the license.
 
 Contact and Links
 =================
