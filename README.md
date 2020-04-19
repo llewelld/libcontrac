@@ -9,6 +9,7 @@ See the draft specs: https://www.apple.com/covid19/contacttracing/
 If you have autoconf you can install as follows.
 
 ```
+autoconf --install
 ./configure
 make
 make check
@@ -29,7 +30,7 @@ Include header files.
 
 ### Broadcasting and uploading keys
 
-Most of the functionality revolves around the Conrac structure.
+Most of the functionality revolves around the opaque `Contrac` structure.
 
 Create and initialise the structure as follows. The day and interval number
 should be set appropriately.
@@ -41,7 +42,7 @@ contrac_set_day_number(contrac, 23);
 contrac_set_time_interval_number(contrac, 76);
 ```
 
-Get the Rolling Proxmity Identifier for broadcast in Bluetooth beacons.
+Get the Rolling Proximity Identifier for broadcast in Bluetooth beacons.
 ```
 // Returns a buffer containing RPI_SIZE bytes of data
 const unsigned char * rpi = contrac_get_proximity_id(contrac);
@@ -59,9 +60,9 @@ const unsigned char * dtk = contrac_get_daily_key(contrac);
 Add RPIs captured via Bluetooth to an RPI list.
 ```
 RpiList * rpis = rpi_list_new();
-Rpi * rpi = rpi_new();
 
-// Add captured bytes at given time
+// Add bytes captured at a given time to the list
+Rpi * rpi = rpi_new();
 rpi_assign(rpi, captured_bytes, time_interval_number);
 rpi_list_append(rpis, rpi);
 ```
@@ -69,9 +70,9 @@ rpi_list_append(rpis, rpi);
 Construct a list of DTKs from data downloaded from a Diagnosis Server.
 ```
 DtkList * dtks = dtk_list_new();
-Dtk * dtk = dtk_new();
 
-// Add data downloaded from the server
+// Add data downloaded from the server to the list
+Dtk * dtk = dtk_new();
 dtk_assign(dtk, dtk_bytes, day_number);
 dtk_list_append(dtks, dtk);
 ```
@@ -108,8 +109,9 @@ libcontrac is released under the GPL v2 Licence. Read COPYING for information on
 More information can be found at: https://www.flypig.co.uk/contrac
 
 The source code can be obtained from git:
-
+```
 git clone git@www.flypig.org.uk:libcontrac
+```
 
 I can be contacted via one of the following.
 
