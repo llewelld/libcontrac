@@ -37,9 +37,8 @@ should be set appropriately.
 
 ```
 Contrac * contrac = contrac_new();
-contrac_generate_tracing_key(contrac);
-contrac_set_day_number(contrac, 23);
-contrac_set_time_interval_number(contrac, 76);
+// Generates a random Tracing Key if one hasn't yet been set
+contrac_update_current_time(data);
 ```
 
 Get the Rolling Proximity Identifier for broadcast in Bluetooth beacons.
@@ -60,21 +59,15 @@ const unsigned char * dtk = contrac_get_daily_key(contrac);
 Add RPIs captured via Bluetooth to an RPI list.
 ```
 RpiList * rpis = rpi_list_new();
-
 // Add bytes captured at a given time to the list
-Rpi * rpi = rpi_new();
-rpi_assign(rpi, captured_bytes, time_interval_number);
-rpi_list_append(rpis, rpi);
+rpi_list_add_beacon(rpis, captured_bytes, time_interval_number);
 ```
 
 Construct a list of DTKs from data downloaded from a Diagnosis Server.
 ```
 DtkList * dtks = dtk_list_new();
-
 // Add data downloaded from the server to the list
-Dtk * dtk = dtk_new();
-dtk_assign(dtk, dtk_bytes, day_number);
-dtk_list_append(dtks, dtk);
+dtk_list_add_diagnosis(dtks, dtk_bytes, day_number);
 ```
 
 Having collected these two lists any matches can be tested for as follows. 

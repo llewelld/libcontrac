@@ -35,6 +35,8 @@ DtkList * dtk_list_new();
 void dtk_list_delete(DtkList * data);
 
 void dtk_list_append(DtkList * data, Dtk * dtk);
+void dtk_list_add_diagnosis(DtkList * data, unsigned char const * dtk_bytes, uint32_t day_number);
+
 DtkListItem const * dtk_list_first(DtkList const * data);
 DtkListItem const * dtk_list_next(DtkListItem const * data);
 Dtk const * dtk_list_get_dtk(DtkListItem const * data);

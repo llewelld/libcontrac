@@ -33,7 +33,7 @@ typedef struct _Dtk Dtk;
 Dtk * dtk_new();
 void dtk_delete(Dtk * data);
 
-bool contrac_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_number);
+bool dtk_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_number);
 const unsigned char * dtk_get_daily_key(Dtk const * data);
 uint32_t dtk_get_day_number(Dtk const * data);
 void dtk_assign(Dtk * data, unsigned char const * dtk_bytes, uint32_t day_number);

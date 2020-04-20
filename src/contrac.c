@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <time.h>
 
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
@@ -48,9 +49,6 @@ struct _Contrac {
 	// Rolling proximity identifier
 	Rpi * rpi;
 
-	uint32_t day_number;
-	uint8_t time_interval_number;
-	
 	uint32_t status;
 };
 
@@ -102,11 +100,10 @@ bool contrac_set_day_number(Contrac * data, uint32_t day_number) {
 	result = ((data->status & STATUS_TK) != 0);
 
 	if (result) {
-		result = contrac_generate_daily_key(data->dtk, data, day_number);
+		result = dtk_generate_daily_key(data->dtk, data, day_number);
 	}
 
 	if (result) {
-		data->day_number = day_number;
 		data->status |= STATUS_DTK;
 	}
 	
@@ -123,7 +120,6 @@ bool contrac_set_time_interval_number(Contrac * data, uint8_t time_interval_numb
 	}
 
 	if (result) {
-		data->time_interval_number = time_interval_number;
 		data->status |= STATUS_RPI;
 	}
 	
@@ -209,8 +205,44 @@ void contrac_get_proximity_id_base64(Contrac const * data, char * base64) {
 	}
 }
 
+bool contrac_update_current_time(Contrac * data) {
+	bool result;
+	time_t epoch;
+	uint32_t dn_stored;
+	uint32_t dn_now;
+	uint8_t tn_stored;
+	uint8_t tn_now;
 
+	result = true;
 
+	if ((data->status & STATUS_TK) == 0) {
+		// No Tracing Key has been set, so generate a random key
+		result = contrac_generate_tracing_key(data);
+	}
 
+	epoch = time(NULL);
+
+	if (result) {
+		dn_now = epoch_to_day_number(epoch);
+		dn_stored = dtk_get_day_number(data->dtk);
+
+		// Only set again if uninitialised or the time has changed
+		if ((dn_now != dn_stored) || ((data->status & STATUS_DTK) == 0)) {
+			result = contrac_set_day_number(data, dn_now);
+		}
+	}
+
+	if (result) {
+		tn_now = epoch_to_time_interval_number(epoch);
+		tn_stored= rpi_get_time_interval_number(data->rpi);
+
+		// Only set again if uninitialised or the time has changed
+		if ((tn_now != tn_stored) || (dn_now != dn_stored) || ((data->status & STATUS_RPI) == 0)) {
+			result = contrac_set_time_interval_number(data, tn_now);
+		}
+	}
+
+	return result;
+}
 
 

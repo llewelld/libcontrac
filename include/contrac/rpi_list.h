@@ -35,6 +35,7 @@ RpiList * rpi_list_new();
 void rpi_list_delete(RpiList * data);
 
 void rpi_list_append(RpiList * data, Rpi * rpi);
+void rpi_list_add_beacon(RpiList * data, unsigned char const * rpi_bytes, uint8_t time_interval_number);
 
 RpiListItem const * rpi_list_first(RpiList const * data);
 RpiListItem const * rpi_list_next(RpiListItem const * data);

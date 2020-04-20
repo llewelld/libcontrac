@@ -29,9 +29,6 @@
 
 // Function prototypes
 
-void contrac_set_tracing_key(Contrac * data, unsigned char const * tracing_key);
-bool contrac_set_tracing_key_base64(Contrac * data, char const * tracing_key);
-
 // Function definitions
 
 #endif // __CONTRAC_PRIVATE_H

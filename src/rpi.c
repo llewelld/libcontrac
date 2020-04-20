@@ -66,7 +66,7 @@ void rpi_delete(Rpi * data) {
 
 bool rpi_generate_proximity_id(Rpi * data, Dtk const * dtk, uint8_t time_interval_number) {
 	int result = 1;
-	unsigned char encode[sizeof(RPI_INFO_PREFIX) + sizeof(uint16_t)];
+	unsigned char encode[sizeof(RPI_INFO_PREFIX) + sizeof(time_interval_number)];
 	unsigned char output[EVP_MAX_MD_SIZE];
 	unsigned int out_length = 0;
 	unsigned int pos;

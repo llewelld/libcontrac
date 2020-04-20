@@ -34,6 +34,12 @@
 
 // Function prototypes
 
+// Override time function
+static time_t fake_time = 0;
+time_t time(time_t *__timer) {
+	return fake_time;
+}
+
 // Function definitions
 
 START_TEST (check_base64) {
@@ -210,19 +216,19 @@ START_TEST (check_rpi) {
 	ck_assert(result);
 	contrac_get_proximity_id_base64(contrac, rpi_base64);
 	ck_assert_int_eq(strlen(rpi_base64), RPI_SIZE_BASE64);
-	ck_assert_str_eq(rpi_base64, "++ucH9hoIkGwCzM+J09faQ==");
+	ck_assert_str_eq(rpi_base64, "yStiu899O+6xvdLiUdrpsA==");
 
 	result = contrac_set_time_interval_number(contrac, 82);
 	ck_assert(result);
 	contrac_get_proximity_id_base64(contrac, rpi_base64);
 	ck_assert_int_eq(strlen(rpi_base64), RPI_SIZE_BASE64);
-	ck_assert_str_eq(rpi_base64, "GrqeroryZQ+Uvhx10zfKWw==");
+	ck_assert_str_eq(rpi_base64, "aFTYIeEUGYKELi8TUUql+Q==");
 
 	result = contrac_set_time_interval_number(contrac, 143);
 	ck_assert(result);
 	contrac_get_proximity_id_base64(contrac, rpi_base64);
 	ck_assert_int_eq(strlen(rpi_base64), RPI_SIZE_BASE64);
-	ck_assert_str_eq(rpi_base64, "+9eL1UlYZ9buUCFF5qRDUA==");
+	ck_assert_str_eq(rpi_base64, "MK9mDdgTsgsh6Vxp0XhasA==");
 
 	contrac_set_tracing_key_base64(contrac, tracing_key_base64[1]);
 
@@ -233,19 +239,19 @@ START_TEST (check_rpi) {
 	ck_assert(result);
 	contrac_get_proximity_id_base64(contrac, rpi_base64);
 	ck_assert_int_eq(strlen(rpi_base64), RPI_SIZE_BASE64);
-	ck_assert_str_eq(rpi_base64, "XmePWi0HlgHyBcVUb0KhjQ==");
+	ck_assert_str_eq(rpi_base64, "layNswS/rQxovfYnBhjXJg==");
 
 	result = contrac_set_time_interval_number(contrac, 27);
 	ck_assert(result);
 	contrac_get_proximity_id_base64(contrac, rpi_base64);
 	ck_assert_int_eq(strlen(rpi_base64), RPI_SIZE_BASE64);
-	ck_assert_str_eq(rpi_base64, "LlPznz6D044ZKYsY3sHJew==");
+	ck_assert_str_eq(rpi_base64, "BJyzAC3hyVfcWOhQ9paEFA==");
 
 	result = contrac_set_time_interval_number(contrac, 143);
 	ck_assert(result);
 	contrac_get_proximity_id_base64(contrac, rpi_base64);
 	ck_assert_int_eq(strlen(rpi_base64), RPI_SIZE_BASE64);
-	ck_assert_str_eq(rpi_base64, "QDG50cy9NTXZ3zDAUGkePQ==");
+	ck_assert_str_eq(rpi_base64, "ItETUQc372fOzJKHvF8z6w==");
 
 	// Clean up
 	contrac_delete(contrac);
@@ -268,8 +274,6 @@ START_TEST (check_match) {
 	int pos;
 	const unsigned char * rpi_bytes;
 	const unsigned char * dtk_bytes;
-	Rpi * rpi;
-	Dtk * dtk;
 	MatchList * matches;
 	MatchListItem const * match;
 
@@ -293,10 +297,7 @@ START_TEST (check_match) {
 		ck_assert(result);
 
 		rpi_bytes = contrac_get_proximity_id(contrac);
-		rpi = rpi_new();
-		rpi_assign(rpi, rpi_bytes, beacon_times[pos]);
-
-		rpi_list_append(beacon_list, rpi);
+		rpi_list_add_beacon(beacon_list, rpi_bytes, beacon_times[pos]);
 	}
 
 	// Generate some diagnosis data (as if provided by a diagnosis server)
@@ -307,10 +308,7 @@ START_TEST (check_match) {
 		ck_assert(result);
 
 		dtk_bytes = contrac_get_daily_key(contrac);
-		dtk = dtk_new();
-		dtk_assign(dtk, dtk_bytes, diagnosis_days[pos]);
-
-		dtk_list_append(diagnosis_list, dtk);
+		dtk_list_add_diagnosis(diagnosis_list, dtk_bytes, diagnosis_days[pos]);
 	}
 
 	// Check that the matching algorithm identifies the beacons that match
@@ -342,6 +340,60 @@ START_TEST (check_match) {
 }
 END_TEST
 
+START_TEST (check_time) {
+	bool result;
+	char const *tracing_key_base64 = "3UmKrtcQ2tfLE8UPSXHb4PtgRfE0E2xdSs+PGVIS8cc=";
+	uint32_t dn;
+	uint8_t tn;
+	time_t base = 1587415596;
+	time_t check;
+	Contrac * contrac;
+	char dtk_base64[DTK_SIZE_BASE64 + 1];
+	char rpi_base64[RPI_SIZE_BASE64 + 1];
+
+	check = base;
+	dn = epoch_to_day_number(check);
+	ck_assert_int_eq(dn, 18372);
+	tn = epoch_to_time_interval_number(check);
+	ck_assert_int_eq(tn, 124);
+
+	check = base + (24 * 60 * 60);
+	dn = epoch_to_day_number(check);
+	ck_assert_int_eq(dn, 18372 + 1);
+	tn = epoch_to_time_interval_number(check);
+	ck_assert_int_eq(tn, 124);
+
+	check = base - 675 * (24 * 60 * 60);
+	dn = epoch_to_day_number(check);
+	ck_assert_int_eq(dn, 18372 - 675);
+	tn = epoch_to_time_interval_number(check);
+	ck_assert_int_eq(tn, 124);
+
+	check = base + 15 * (10 * 60);
+	dn = epoch_to_day_number(check);
+	ck_assert_int_eq(dn, 18372);
+	tn = epoch_to_time_interval_number(check);
+	ck_assert_int_eq(tn, 124 + 15);
+
+	fake_time = 1587415596;
+
+	contrac = contrac_new();
+	contrac_set_tracing_key_base64(contrac, tracing_key_base64);
+
+	contrac_update_current_time(contrac);
+	result = contrac_get_initialised(contrac);
+	ck_assert(result);
+
+	contrac_get_daily_key_base64(contrac, dtk_base64);
+	ck_assert_str_eq(dtk_base64, "6GMXmeDAR5XU0AEtZQJ+tA==");
+
+	contrac_get_proximity_id_base64(contrac, rpi_base64);
+	ck_assert_str_eq(rpi_base64, "ysbjVuF7xf9eDH2y2T8VpQ==");
+
+	contrac_delete(contrac);
+}
+END_TEST
+
 int main(void) {
 	int failed;
 	Suite * s;
@@ -356,6 +408,7 @@ int main(void) {
 	tcase_add_test(tc, check_dtk);
 	tcase_add_test(tc, check_rpi);
 	tcase_add_test(tc, check_match);
+	tcase_add_test(tc, check_time);
 	suite_add_tcase(s, tc);
 	sr = srunner_create(s);
 

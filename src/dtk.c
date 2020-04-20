@@ -65,7 +65,7 @@ void dtk_delete(Dtk * data) {
 	}
 }
 
-bool contrac_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_number) {
+bool dtk_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_number) {
 	int result = 1;
 	char encode[sizeof(DTK_INFO_PREFIX) + sizeof(day_number)];
 	size_t out_length = 0;

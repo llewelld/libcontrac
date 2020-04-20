@@ -99,4 +99,12 @@ Rpi const * rpi_list_get_rpi(RpiListItem const * data) {
 	return data->rpi;
 }
 
+void rpi_list_add_beacon(RpiList * data, unsigned char const * rpi_bytes, uint8_t time_interval_number) {
+	Rpi * rpi = rpi_new();
+	rpi_assign(rpi, rpi_bytes, time_interval_number);
+	rpi_list_append(data, rpi);
+}
+
+
+
 

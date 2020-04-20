@@ -98,4 +98,9 @@ Dtk const * dtk_list_get_dtk(DtkListItem const * data) {
 	return data->dtk;
 }
 
+void dtk_list_add_diagnosis(DtkList * data, unsigned char const * dtk_bytes, uint32_t day_number) {
+	Dtk * dtk = dtk_new();
+	dtk_assign(dtk, dtk_bytes, day_number);
+	dtk_list_append(data, dtk);
+}
 

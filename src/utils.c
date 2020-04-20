@@ -66,4 +66,32 @@ void base64_decode_base64_to_binary(unsigned char const *input, size_t input_siz
 	EVP_DecodeBlock(output, input, size_in);
 }
 
+uint32_t epoch_to_day_number(time_t epoch) {
+	uint32_t day_number;
+
+	// DayNumber <- (Number of Seconds since Epoch) / 60 × 60 × 24
+	day_number = epoch / (60 * 60 * 24);
+
+	return day_number;
+}
+
+uint8_t epoch_to_time_interval_number(time_t epoch) {
+	uint8_t time_interval_number;
+	uint32_t day_number;
+	uint32_t seconds;
+
+	// TimeNumberInterval <- (Seconds Since Start of DayNumber) / 60 × 10
+	day_number = epoch_to_day_number(epoch);
+	seconds = epoch - (day_number * (60 * 60 * 24));
+
+	time_interval_number = seconds / (60 * 10);
+
+	// Falls in interval [0,143]
+	if (time_interval_number > 143) {
+		time_interval_number = 143;
+	}
+
+	return time_interval_number;
+}
+
 
