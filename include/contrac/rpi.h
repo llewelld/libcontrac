@@ -25,8 +25,8 @@
 // Defines
 
 #define RPI_SIZE (16)
-#define RPI_INTERVAL_MAX (144)
 #define RPI_SIZE_BASE64 (24)
+#define RPI_INTERVAL_MAX (144)
 
 // Structures
 

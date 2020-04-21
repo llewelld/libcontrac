@@ -1,17 +1,24 @@
-/** \ingroup contrac
+/** \ingroup DailyTracingKey
  * @file
- * @author	David Llewellyn-Jones
+ * @author	David Llewellyn-Jones <david@flypig.co.uk>
  * @version	$(VERSION)
  *
  * @section LICENSE
  *
+ * Copyright David Llewellyn-Jones, 2020
+ * Released under the GPLv2.
  *
- *
- * @brief
+ * @brief Daily Tracing Key functionality
  * @section DESCRIPTION
  *
+ * This class is used to generate and manage the Daily Tracing Key. It's
+ * largely internal. The functionality from \ref Contrac should generally be
+ * used instead of these functions.
  *
- *
+ */
+
+/** \addtogroup DailyTracingKey
+ *  @{
  */
 
 // Includes
@@ -34,10 +41,25 @@
 
 // Defines
 
+/**
+ * Used internally.
+ *
+ * This is the prefix for the Info parameter provided to the HKDF and used to
+ * generate the DTK.
+ */
 #define DTK_INFO_PREFIX "CT-DTK"
 
 // Structures
 
+/**
+ * @brief The structure used to represent a Daily Tracing Key.
+ *
+ * This is an opaque structure that contains information about the DTK..
+ *
+ * This must be passed as the first parameter of every non-static function.
+ *
+ * The structure typedef is in dtk.h
+ */
 struct _Dtk {
 	// Daily key
 	unsigned char dtk[DTK_SIZE];
@@ -48,6 +70,11 @@ struct _Dtk {
 
 // Function definitions
 
+/**
+ * Create a new instance of the class.
+ *
+ * @return The newly created object.
+ */
 Dtk * dtk_new() {
 	Dtk * data;
 	
@@ -56,6 +83,11 @@ Dtk * dtk_new() {
 	return data;
 }
 
+/**
+ * Delete an instance of the class, freeing up the memory allocated to it.
+ *
+ * @param data The instance to free.
+ */
 void dtk_delete(Dtk * data) {
 	if (data) {
 		// Clear the data for security
@@ -65,6 +97,18 @@ void dtk_delete(Dtk * data) {
 	}
 }
 
+/**
+ * Generate a random Daily Tracing Key.
+ *
+ * The operation may fail under certain circumstances, such as if the
+ * HKDF operation fails for some reason.
+ *
+ * For internal use. It generally makes more sense to use the
+ * contrac_set_day_number() function instead.
+ *
+ * @param data The context object to work with.
+ * @return true if the operation completed successfully, false otherwise.
+ */
 bool dtk_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_number) {
 	int result = 1;
 	char encode[sizeof(DTK_INFO_PREFIX) + sizeof(day_number)];
@@ -136,4 +180,5 @@ void dtk_assign(Dtk * data, unsigned char const * dtk_bytes, uint32_t day_number
 	data->day_number = day_number;
 }
 
+/** @} addtogroup DailyTracingKey */
 

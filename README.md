@@ -30,10 +30,10 @@ Include header files.
 
 ### Broadcasting and uploading keys
 
-Most of the functionality revolves around the opaque `Contrac` structure.
+Most of the functionality is managed through the opaque `Contrac` structure.
 
-Create and initialise the structure as follows. The day and interval number
-should be set appropriately.
+Create and initialise the structure as follows. The update call updates the
+Daily Tracing Key and Rolling Proximity Identifier based on the current time.
 
 ```
 Contrac * contrac = contrac_new();
@@ -44,14 +44,14 @@ contrac_update_current_time(data);
 Get the Rolling Proximity Identifier for broadcast in Bluetooth beacons.
 ```
 // Returns a buffer containing RPI_SIZE bytes of data
-const unsigned char * rpi = contrac_get_proximity_id(contrac);
+unsigned char const * rpi = contrac_get_proximity_id(contrac);
 ```
 
 Get the Daily Tracing Key to upload to a Diagnosis Server in case of a positive
 test result.
 ```
 // Returns a buffer containing DTK_SIZE bytes of data
-const unsigned char * dtk = contrac_get_daily_key(contrac);
+unsigned char const * dtk = contrac_get_daily_key(contrac);
 ```
 
 ### Receiving and matching keys
@@ -63,10 +63,10 @@ RpiList * rpis = rpi_list_new();
 rpi_list_add_beacon(rpis, captured_bytes, time_interval_number);
 ```
 
-Construct a list of DTKs from data downloaded from a Diagnosis Server.
+Construct a list of DTKs using data downloaded from a Diagnosis Server.
 ```
 DtkList * dtks = dtk_list_new();
-// Add data downloaded from the server to the list
+// Add data downloaded from a Diagnosis Server to the list
 dtk_list_add_diagnosis(dtks, dtk_bytes, day_number);
 ```
 
