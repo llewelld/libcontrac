@@ -1,0 +1,174 @@
+/**
+ * @mainpage
+ *
+ * @version $(VERSION)
+ *
+ * libcontrac is an implementation of the Apple/Google Contact Tracing API.
+ * 
+ * See the draft specs: https://www.apple.com/covid19/contacttracing/
+ * 
+ * ## Install
+ * 
+ * If you have autoconf you can install as follows.
+ * 
+ * ```
+ * autoreconf --install
+ * ./configure
+ * make
+ * make check
+ * make install
+ * ```
+ * 
+ * ## Usage
+ * 
+ * Include header files.
+ * ```
+ * #include "contrac/contrac.h"
+ * #include "contrac/rpi.h"
+ * #include "contrac/dtk.h"
+ * #include "contrac/rpi_list.h"
+ * #include "contrac/rpi_list.h"
+ * #include "contrac/matches.h"
+ * ```
+ * 
+ * ### Broadcasting and uploading keys
+ * 
+ * Most of the functionality is managed through the opaque `Contrac` structure.
+ * 
+ * Create and initialise the structure as follows. The update call updates the
+ * Daily Tracing Key and Rolling Proximity Identifier based on the current time.
+ * 
+ * ```
+ * Contrac * contrac = contrac_new();
+ * // Generates a random Tracing Key if one hasn't yet been set
+ * contrac_update_current_time(data);
+ * ```
+ * 
+ * Get the Rolling Proximity Identifier for broadcast in Bluetooth beacons.
+ * ```
+ * // Returns a buffer containing RPI_SIZE bytes of data
+ * unsigned char const * rpi = contrac_get_proximity_id(contrac);
+ * ```
+ * 
+ * Get the Daily Tracing Key to upload to a Diagnosis Server in case of a positive
+ * test result.
+ * ```
+ * // Returns a buffer containing DTK_SIZE bytes of data
+ * unsigned char const * dtk = contrac_get_daily_key(contrac);
+ * ```
+ * 
+ * ### Receiving and matching keys
+ * 
+ * Add RPIs captured via Bluetooth to an RPI list.
+ * ```
+ * RpiList * rpis = rpi_list_new();
+ * // Add bytes captured at a given time to the list
+ * rpi_list_add_beacon(rpis, captured_bytes, time_interval_number);
+ * ```
+ * 
+ * Construct a list of DTKs using data downloaded from a Diagnosis Server.
+ * ```
+ * DtkList * dtks = dtk_list_new();
+ * // Add data downloaded from a Diagnosis Server to the list
+ * dtk_list_add_diagnosis(dtks, dtk_bytes, day_number);
+ * ```
+ * 
+ * Having collected these two lists any matches can be tested for as follows. 
+ * 
+ * ```
+ * MatchList * matches = match_list_new();
+ * match_list_find_matches(matches, rpis, dtks);
+ * 
+ * if (match_list_count(matches) > 0) {
+ * 	printf("Exposure identified, follow medical advice\n");
+ * }
+ * ```
+ * 
+ * ### Cleaning up
+ * 
+ * Finally, clean up.
+ * ```
+ * match_list_delete(matches);
+ * rpi_list_delete(rpis);
+ * dtk_list_delete(dtks);
+ * contrac_delete(contrac);
+ * ```
+ */
+
+/**
+ * @defgroup KeyGeneration Key Generation
+ * @brief Core Contact Tracing functionality
+ *
+ * This class provides the core Contact Tracing functionality. It provides an
+ * interfaces for:
+ * 1. Generating a random Tracing Key.
+ * 2. Generating a Daily Tracing Key based on the current day number.
+ * 3. Generating a Rolling Proximity Identifier based on the current time
+ *    interval number.
+ *
+ * Values can be extracted and set in binary or base64 format.
+ * 
+ */
+
+/**
+ * @defgroup Utils Utilities
+ * @brief Static utility functions
+ *
+ * Provides various static utitlity functions. In particular:
+ *
+ * base64 encoding and decoding functionality.
+ * Time conversion: from epoch to day numbers and time interval numbers.
+ * 
+ */
+
+/**
+ * @defgroup DailyTracingKey Daily Tracing Key
+ * @brief Daily Tracing Key functionality
+ *
+ * This class is used to generate and manage the Daily Tracing Key (DTK). It's
+ * largely internal. The functionality from \ref Contrac should generally be
+ * used in preference to this.
+ * 
+ */
+
+/**
+ * @defgroup RandomProximityIdentifier Random Proximity Identifier
+ * @brief Proximity Identifier functionality
+ *
+ * This class is used to generate and manage the Random Proximity Identifier
+ * (RPI). It's largely internal. The functionality from \ref Contrac should
+ * generally be used in preference to this.
+ * 
+ */
+
+/**
+ * @defgroup Containers Containers
+ * @brief Provides containers for managing lists of items
+ *
+ * This allows the simplified management of lists of Dtk and Rpi objects. This
+ * is useful when checking DTKs received from a Diagnosis Server with RPIs
+ * captured over Bluetooth. The two can be easily stored and passed into the
+ * \ref match_list_find_matches() function.
+ * 
+ */
+
+/**
+ * @defgroup Matching Matching
+ * @brief Provides a way to match collected RPIs with downloaded DTKs.
+ *
+ * This class provides functionality allowing RPIs that have been collected
+ * over Bluetooth to be matched against DTKs downloaded from a Diagnosis
+ * Server.
+ * 
+ */
+
+/**
+ * @defgroup Logging Logging
+ * @brief Allows output to be sent to the log
+ *
+ * This is a simple set of functions and macros that allows strings to be
+ * recorded in the syslog.
+ * 
+ */
+
+

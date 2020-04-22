@@ -11,9 +11,9 @@
  * @brief Daily Tracing Key functionality
  * @section DESCRIPTION
  *
- * This class is used to generate and manage the Daily Tracing Key. It's
+ * This class is used to generate and manage the Daily Tracing Key (DTK). It's
  * largely internal. The functionality from \ref Contrac should generally be
- * used instead of these functions.
+ * used in preference to this.
  *
  */
 
@@ -71,7 +71,7 @@ struct _Dtk {
 // Function definitions
 
 /**
- * Create a new instance of the class.
+ * Creates a new instance of the class.
  *
  * @return The newly created object.
  */
@@ -84,7 +84,7 @@ Dtk * dtk_new() {
 }
 
 /**
- * Delete an instance of the class, freeing up the memory allocated to it.
+ * Deletes an instance of the class, freeing up the memory allocated to it.
  *
  * @param data The instance to free.
  */
@@ -98,7 +98,7 @@ void dtk_delete(Dtk * data) {
 }
 
 /**
- * Generate a random Daily Tracing Key.
+ * Generates a Daily Tracing Key based on the day number provided.
  *
  * The operation may fail under certain circumstances, such as if the
  * HKDF operation fails for some reason.
@@ -107,6 +107,7 @@ void dtk_delete(Dtk * data) {
  * contrac_set_day_number() function instead.
  *
  * @param data The context object to work with.
+ * @param day_number The day number to use to generate the key.
  * @return true if the operation completed successfully, false otherwise.
  */
 bool dtk_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_number) {
@@ -114,7 +115,7 @@ bool dtk_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_nu
 	char encode[sizeof(DTK_INFO_PREFIX) + sizeof(day_number)];
 	size_t out_length = 0;
 	EVP_PKEY_CTX *pctx = NULL;
-	const unsigned char * tk;
+	unsigned char const * tk;
 
 	// dtk_i <- HKDF(tk, NULL, (UTF8("CT-DTK") || D_i), 16)
 
@@ -167,14 +168,58 @@ bool dtk_generate_daily_key(Dtk * data, Contrac const * contrac, uint32_t day_nu
 	return (result > 0);
 }
 
-const unsigned char * dtk_get_daily_key(Dtk const * data) {
+/**
+ * Gets the Daily Tracing Key for the device in binary format.
+ *
+ * For internal use. It generally makes more sense to use the
+ * contrac_get_daily_key() function instead.
+ *
+ * This allows the Daily Tracing Key to be extracted. The Daily Tracing Key
+ * should be kept secret (to maintain privacy) until a positive test is
+ * confirmed, at which point the user may choose to upload the key to a
+ * Diagnosis Server, so that others can be notified.
+ *
+ * The buffer returned will contain exactly DTK_SIZE (16) bytes of data in
+ * binary format. This may therefore contain null bytes, and the buffer will not
+ * necessarily be null terminated. Future operations may cause the data to
+ * change, so the caller should make a copy of the buffer rather than keeping
+ * a pointer to it.
+ *
+ * @param data The context object to work with.
+ * @return The Daily Tracing Key in binary format, not null terminated.
+ */
+unsigned char const * dtk_get_daily_key(Dtk const * data) {
 	return data->dtk;
 }
 
+/**
+ * Gets the day number that applies to the current DTK.
+ *
+ * For internal use. It generally makes more sense to use the
+ * contrac_get_day_number() function instead.
+ *
+ * @param data The context object to work with.
+ * @return The day number stored in the object..
+ */
 uint32_t dtk_get_day_number(Dtk const * data) {
 	return data->day_number;
 }
 
+/**
+ * Populates the data structure.
+ *
+ * Allows the DTK and day number values of the object to be set explicitly.
+ *
+ * For internal use. To set the DTK it generally makes more sense to use one of
+ * eiher contrac_set_day_number() or contrac_update_current_time() instead.
+ *
+ * The dtk_bytes buffer passed in must contain exactly DTK_SIZE (16) bytes of
+ * data. It doen't have to be null terminated.
+ *
+ * @param data The context object to work with.
+ * @param dtk_bytes The DTK value to set, in binary format.
+ * @param day_number The day number to associate with this DTK.
+ */
 void dtk_assign(Dtk * data, unsigned char const * dtk_bytes, uint32_t day_number) {
 	memcpy(data->dtk, dtk_bytes, DTK_SIZE);
 	data->day_number = day_number;

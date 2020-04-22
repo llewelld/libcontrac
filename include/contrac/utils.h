@@ -1,19 +1,26 @@
-/** \ingroup contrac
+/** \ingroup Utils
  * @file
- * @author	David Llewellyn-Jones
+ * @author	David Llewellyn-Jones <david@flypig.co.uk>
  * @version	$(VERSION)
  *
  * @section LICENSE
  *
+ * Copyright David Llewellyn-Jones, 2020
+ * Released under the GPLv2.
  *
- *
- * @brief
+ * @brief Static utility functions
  * @section DESCRIPTION
  *
+ * Provides various static utitlity functions. In particular:
  *
+ * base64 encoding and decoding functionality.
+ * Time conversion: from epoch to day numbers and time interval numbers.
  *
  */
 
+/** \addtogroup Utils
+ *  @{
+ */
 
 #ifndef __UTILS_H
 #define __UTILS_H
@@ -50,7 +57,5 @@ uint8_t epoch_to_time_interval_number(time_t epoch);
 
 #endif // __UTILS_H
 
-
-
-
+/** @} addtogroup Utils */
 

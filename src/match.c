@@ -1,17 +1,27 @@
-/** \ingroup contrac
+/** \ingroup Matching
  * @file
- * @author	David Llewellyn-Jones
+ * @author	David Llewellyn-Jones <david@flypig.co.uk>
  * @version	$(VERSION)
  *
  * @section LICENSE
  *
+ * Copyright David Llewellyn-Jones, 2020
+ * Released under the GPLv2.
  *
- *
- * @brief
+ * @brief Provides a way to match collected RPIs with downloaded DTKs.
  * @section DESCRIPTION
  *
+ * This class provides functionality allowing RPIs that have been collected
+ * over Bluetooth to be matched against DTKs downloaded from a Diagnosis
+ * Server.
  *
+ * The list of RPIs and DTKs can be constructed easily using the
+ * \ref Container functions.
  *
+ */
+
+/** \addtogroup Matching
+ *  @{
  */
 
 // Includes
@@ -37,6 +47,14 @@
 
 // Structures
 
+/**
+ * @brief A match list element
+ *
+ * This is an opaque structure that represents a single item in the list and
+ * captures a match between an RPI and a DTK.
+ * 
+ * The structure typedef is in match.h
+ */
 struct _MatchListItem {
 	uint32_t day_number;
 	uint8_t time_interval_number;
@@ -44,6 +62,17 @@ struct _MatchListItem {
 	MatchListItem * next;
 };
 
+/**
+ * @brief The head of a match list
+ *
+ * This is an opaque structure that represents the head of the list. Each item
+ * in the list captures a match between an RPI and a DTK.
+ * 
+ * This is the object usually passed as the first parameter of every non-static
+ * function.
+ *
+ * The structure typedef is in match.h
+ */
 struct _MatchList {
 	size_t count;
 	MatchListItem * first;
@@ -58,6 +87,11 @@ void match_list_append(MatchList * data, MatchListItem * item);
 
 // Function definitions
 
+/**
+ * Creates a new instance of the class.
+ *
+ * @return The newly created object.
+ */
 MatchList * match_list_new() {
 	MatchList * data;
 	
@@ -66,6 +100,13 @@ MatchList * match_list_new() {
 	return data;
 }
 
+/**
+ * Deletes an instance of the class, freeing up the memory allocated to it.
+ *
+ * This will also delete all items contained in the list.
+ *
+ * @param data The instance to free.
+ */
 void match_list_delete(MatchList * data) {
 	if (data) {
 		match_list_clear(data);
@@ -74,6 +115,11 @@ void match_list_delete(MatchList * data) {
 	}
 }
 
+/**
+ * Creates a new instance of the class.
+ *
+ * @return The newly created object.
+ */
 MatchListItem * match_list_item_new() {
 	MatchListItem * data;
 	
@@ -82,12 +128,25 @@ MatchListItem * match_list_item_new() {
 	return data;
 }
 
+/**
+ * Deletes an instance of the class, freeing up the memory allocated to it.
+ *
+ * @param data The instance to free.
+ */
 void match_list_item_delete(MatchListItem * data) {
 	if (data) {
 		free(data);
 	}
 }
 
+/**
+ * Clears all items from the list.
+ *
+ * Removes all items from the list to create an empty list. The memory
+ * associated with the items in the list is freed.
+ *
+ * @param data The list to operate on.
+ */
 void match_list_clear(MatchList * data) {
 	MatchListItem * item;
 	MatchListItem * next;
@@ -104,27 +163,79 @@ void match_list_clear(MatchList * data) {
 	data->count = 0;
 }
 
+/**
+ * Returns the number of items in the list.
+ *
+ * Immediately after creation, or after the \ref match_list_clear() function
+ * has been called, this will return zero.
+ *
+ * @param data The list to operate on.
+ */
 size_t match_list_count(MatchList * data) {
 	return data->count;
 }
 
+/**
+ * Returns the first item in the list.
+ *
+ * Useful for iterating through the items in the list.
+ *
+ * @param data The list to operate on.
+ * @return The first item of the list.
+ */
 MatchListItem const * match_list_first(MatchList const * data) {
 	return data->first;
 }
 
+/**
+ * Returns the next item in the list.
+ *
+ * Useful for iterating through the items in the list.
+ *
+ * @param data The current item in the list.
+ * @return The next item in the list following the current item.
+ */
 MatchListItem const * match_list_next(MatchListItem const * data) {
 	return data->next;
 }
 
 
+/**
+ * Returns the day number of the item in the list.
+ *
+ * This will represent the day number of when an interaction occurred with
+ * someone who has subsequently uploaded their DTK to a diagnosis server due to
+ * testing positive.
+ *
+ * @param data The list to operate on.
+ * @return The day number for this item.
+ */
 uint32_t match_list_get_day_number(MatchListItem const * data) {
 	return data->day_number;
 }
 
+/**
+ * Returns the time interval number of the item in the list.
+ *
+ * This will represent the time interval number of when an interaction occurred
+ * with someone who has subsequently uploaded their DTK to a diagnosis server
+ * due to testing positive.
+ *
+ * @param data The list to operate on.
+ * @return The time interval number for this item.
+ */
 uint8_t match_list_get_time_interval_number(MatchListItem const * data) {
 	return data->time_interval_number;
 }
 
+/**
+ * Adds an item to the list.
+ *
+ * This adds a match to the list. It's primarily for internal use.
+ *
+ * @param data The list to append to.
+ * @param item The match to append.
+ */
 void match_list_append(MatchList * data, MatchListItem * item) {
 	if (data->last == NULL) {
 		data->first = item;
@@ -137,6 +248,23 @@ void match_list_append(MatchList * data, MatchListItem * item) {
 	data->count++;
 }
 
+/**
+ * Returns a list of matches found between the beacons and diagnoses.
+ *
+ * This searches through the list of DTKs and the list of RPIs provided, and
+ * returns a list of matches.
+ *
+ * If the returned list has any elements in, this would suggest that the user
+ * has been in contact with someone who tested positive and uploaded their DTK
+ * to a Diagnosis Server.
+ *
+ * The match list isn't cleared by this call and so any new values will be
+ * appended to it.
+ *
+ * @param data The list that any matches will be appended to.
+ * @param beacons A list of RPIs extracted from overheard BLE beacons.
+ * @param diagnosis_keys A list of DTKs downloaed from a Diagnosis Server.
+ */
 void match_list_find_matches(MatchList * data, RpiList * beacons, DtkList * diagnosis_keys) {
 	// For each diagnosis key, generate the RPIs and compare them against the captured RPI beacons
 	DtkListItem const * dtk_item;
@@ -188,4 +316,5 @@ void match_list_find_matches(MatchList * data, RpiList * beacons, DtkList * diag
 	rpi_delete(generated);
 }
 
+/** @} addtogroup Matching*/
 

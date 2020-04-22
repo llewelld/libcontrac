@@ -29,6 +29,22 @@
 
 // Function prototypes
 
+/**
+ * Log a string to syslog.
+ *
+ * In generl, the LOG macro should be used instead.
+ *
+ * Constructs a message using the supplied format and parameters and records it
+ * in the system log. The format is the same as for printf.
+ *
+ * The logging levels are the standard syslog levels:
+ *
+ * LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERR, etc.
+ *
+ * @param priority The log level priority.
+ * @param format The format for the message, the same as for printf.
+ * @param ... parameters to combine with the format to create the message.
+ */
 void log_priority(int priority, const char *format, ...) {
 	va_list args;
 	int length;

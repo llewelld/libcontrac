@@ -8,7 +8,7 @@
  * Copyright David Llewellyn-Jones, 2020
  * Released under the GPLv2.
  *
- * @brief Core Contact Tracing functionality 
+ * @brief Core Contact Tracing functionality
  * @section DESCRIPTION
  *
  * This class provides the core Contact Tracing functionality. It provides an
@@ -47,7 +47,7 @@
 // Defines
 
 /**
- * Inernal flag mask.
+ * A mask used internally with the status flags.
  * 
  * When set the flag indicates that the Tracing Key has been correctly
  * initialised.
@@ -55,7 +55,7 @@
 #define STATUS_TK (1 << 0)
 
 /**
- * Inernal flag mask.
+ * A mask used internally with the status flags.
  * 
  * When set the flag indicates that the Daily Tracing Key has been correctly
  * initialised.
@@ -63,7 +63,7 @@
 #define STATUS_DTK (1 << 1)
 
 /**
- * Inernal flag mask.
+ * A mask used internally with the status flags.
  * 
  * When set the flag indicates that the Rolling Proximity Identifier has been
  * correctly initialised.
@@ -71,7 +71,7 @@
 #define STATUS_RPI (1 << 2)
 
 /**
- * Inernal flag mask.
+ * A mask used internally with the status flags.
  * 
  * When all of these flags are set it indicates that the structure is fully
  * initialised.
@@ -105,7 +105,7 @@ struct _Contrac {
 // Function definitions
 
 /**
- * Create a new instance of the class.
+ * Creates a new instance of the class.
  *
  * @return The newly created object.
  */
@@ -120,7 +120,7 @@ Contrac * contrac_new() {
 }
 
 /**
- * Delete an instance of the class, freeing up the memory allocated to it.
+ * Deletes an instance of the class, freeing up the memory allocated to it.
  *
  * @param data The instance to free.
  */
@@ -137,7 +137,7 @@ void contrac_delete(Contrac * data) {
 }
 
 /**
- * Generate a random Contact Tracing Key.
+ * Generates a random Contact Tracing Key.
  *
  * The operation may fail under certain circumstances, such as there being
  * insufficient entropy in the system to guarantee a random result.
@@ -162,7 +162,7 @@ bool contrac_generate_tracing_key(Contrac * data) {
 }
 
 /**
- * Set the current day number.
+ * Sets the current day number.
  *
  * This will result in a new Daily Tracing Key being generated based on the
  * day provided. If neither the Tracing Key nor the day have changed, the DTK
@@ -171,12 +171,13 @@ bool contrac_generate_tracing_key(Contrac * data) {
  * The day number is calculated as:
  *     (Number of Seconds since Epoch) / (60 * 60 * 24)
  * 
- * Which can be caluclated from the current epoch using the
+ * Which can be calculated from the current epoch using the
  * epoch_to_day_number() function.
  *
  * The operation may fail if a Tracing Key has yet to be configured.
  *
  * @param data The context object to work with.
+ * @param day_number The day number used to generate the DTK.
  * @return true if the operation completed successfully, false otherwise.
  */
 bool contrac_set_day_number(Contrac * data, uint32_t day_number) {
@@ -196,7 +197,7 @@ bool contrac_set_day_number(Contrac * data, uint32_t day_number) {
 }
 
 /**
- * Set the current time interval number.
+ * Sets the current time interval number.
  *
  * This will result in a new Rolling Proximity Idetifier being generated based 
  * on the time interval number. If none of the Tracing Key, day nor time 
@@ -207,7 +208,7 @@ bool contrac_set_day_number(Contrac * data, uint32_t day_number) {
  *
  * and must fall in the interval [0, 143].
  *
- * It can be caluclated from the current epoch using the
+ * It can be calculated from the current epoch using the
  * epoch_to_time_interval_number() function.
  *
  * The operation may fail if a Tracing Key or Daily Tracing Key have yet to be
@@ -234,7 +235,7 @@ bool contrac_set_time_interval_number(Contrac * data, uint8_t time_interval_numb
 }
 
 /**
- * Get whether the internal state has been fully configured or not.
+ * Gets whether the internal state has been fully configured or not.
  *
  * The internal state must be fully configured before a Daily Tracing Key or
  * Rolling Proximity Identifier can be calculated. This function returns whether
@@ -258,7 +259,45 @@ bool contrac_get_initialised(Contrac const * data) {
 }
 
 /**
- * Set the Tracing Key for the device in binary format.
+ * Gets the current day number.
+ *
+ * Gets the current day number used to generate the most recent DTK.
+ *
+ * The day number is calculated as:
+ *     (Number of Seconds since Epoch) / (60 * 60 * 24)
+ * 
+ * Which can be caluclated from the current epoch using the
+ * epoch_to_day_number() function.
+ *
+ * @param data The context object to work with.
+ * @return The day number most recently used to generate the DTK.
+ */
+uint32_t contrac_get_day_number(Contrac * data) {
+	return dtk_get_day_number(data->dtk);
+}
+
+/**
+ * Gets the current time interval number.
+ *
+ * Gets the current time interval number used to generate the most recent RPI.
+ *
+ * The time interval number is calculated as:
+ *     (Seconds Since Start of DayNumber) / (60 * 10)
+ *
+ * and must fall in the interval [0, 143].
+ *
+ * It can be caluclated from the current epoch using the
+ * epoch_to_time_interval_number() function.
+ *
+ * @param data The context object to work with.
+ * @return The time interval number most recently used to generate the RPI.
+ */
+uint8_t contrac_get_time_interval_number(Contrac * data) {
+	return rpi_get_time_interval_number(data->rpi);
+}
+
+/**
+ * Sets the Tracing Key for the device in binary format.
  *
  * When first configuring a system, the Tracing Key must be generated
  * randomly, e.g. using contrac_generate_tracing_key().
@@ -267,7 +306,7 @@ bool contrac_get_initialised(Contrac const * data) {
  * In this case the key can be restored using this function.
  *
  * The tracing_key buffer passed in must contain exactly TK_SIZE (32) bytes of
- * data.
+ * data.It doen't have to be null terminated.
  *
  * @param data The context object to work with.
  * @param tracing_key The Tracing Key to set in binary format.
@@ -278,7 +317,7 @@ void contrac_set_tracing_key(Contrac * data, unsigned char const * tracing_key) 
 }
 
 /**
- * Get the Tracing Key for the device in binary format.
+ * Gets the Tracing Key for the device in binary format.
  *
  * This allows the Tracing Key to be extracted. The Tracing Key should be kept
  * secret (to maintain privacy), however it still may need to be extracted, for
@@ -286,7 +325,9 @@ void contrac_set_tracing_key(Contrac * data, unsigned char const * tracing_key) 
  *
  * The buffer returned will contain exactly TK_SIZE (32) bytes of data in binary
  * format. This may therefore contain null bytes, and the buffer will not 
- * necessarily be null terminated.
+ * necessarily be null terminated. Future operations may cause the data to
+ * change, so the caller should make a copy of the buffer rather than keeping
+ * the pointer to it.
  *
  * @param data The context object to work with.
  * @return The Tracing Key in binary format, not null terminated.
@@ -296,7 +337,7 @@ unsigned char const * contrac_get_tracing_key(Contrac const * data) {
 }
 
 /**
- * Get the Tracing Key for the device in base64 format.
+ * Gets the Tracing Key for the device in base64 format.
  *
  * This allows the Tracing Key to be extracted. The Tracing Key should be kept
  * secret (to maintain privacy), however it still may need to be extracted, for
@@ -319,7 +360,7 @@ void contrac_get_tracing_key_base64(Contrac const * data, char * base64) {
 }
 
 /**
- * Set the Tracing Key for the device in base64 format.
+ * Sets the Tracing Key for the device in base64 format.
  *
  * When first configuring a system, the Tracing Key must be generated
  * randomly, e.g. using contrac_generate_tracing_key().
@@ -362,7 +403,7 @@ bool contrac_set_tracing_key_base64(Contrac * data, char const * tracing_key) {
 }
 
 /**
- * Get the Daily Tracing Key for the device in binary format.
+ * Gets the Daily Tracing Key for the device in binary format.
  *
  * This allows the Daily Tracing Key to be extracted. The Daily Tracing Key
  * should be kept secret (to maintain privacy) until a positive test is
@@ -371,7 +412,9 @@ bool contrac_set_tracing_key_base64(Contrac * data, char const * tracing_key) {
  *
  * The buffer returned will contain exactly DTK_SIZE (16) bytes of data in
  * binary format. This may therefore contain null bytes, and the buffer will not 
- * necessarily be null terminated.
+ * necessarily be null terminated. Future operations may cause the data to
+ * change, so the caller should make a copy of the buffer rather than keeping
+ * the pointer to it.
  *
  * @param data The context object to work with.
  * @return The Daily Tracing Key in binary format, not null terminated.
@@ -381,7 +424,7 @@ unsigned char const * contrac_get_daily_key(Contrac const * data) {
 }
 
 /**
- * Get the Daily Tracing Key for the device in base64 format.
+ * Gets the Daily Tracing Key for the device in base64 format.
  *
  * This allows the Daily Tracing Key to be extracted. The Daily Tracing Key
  * should be kept secret (to maintain privacy) until a positive test is
@@ -405,7 +448,7 @@ void contrac_get_daily_key_base64(Contrac const * data, char * base64) {
 }
 
 /**
- * Get the Rolling Proximity Identifier for the device in binary format.
+ * Gets the Rolling Proximity Identifier for the device in binary format.
  *
  * This allows the Rolling Proximity Identifier to be extracted. The Rolling
  * Proximity Identifier is for broadcast to other devices using BLE and changes
@@ -413,7 +456,9 @@ void contrac_get_daily_key_base64(Contrac const * data, char * base64) {
  *
  * The buffer returned will contain exactly RPI_SIZE (16) bytes of data in
  * binary format. This may therefore contain null bytes, and the buffer will not 
- * necessarily be null terminated.
+ * necessarily be null terminated. Future operations may cause the data to
+ * change, so the caller should make a copy of the buffer rather than keeping
+ * the pointer to it.
  *
  * @param data The context object to work with.
  * @return The Rolling Proximity Identifier in binary format, not null 
@@ -424,7 +469,7 @@ unsigned char const * contrac_get_proximity_id(Contrac const * data) {
 }
 
 /**
- * Get the Rolling Proximity Identifier for the device in base64 format.
+ * Gets the Rolling Proximity Identifier for the device in base64 format.
  *
  * This allows the Rolling Proximity Identifier to be extracted. The Rolling
  * Proximity Identifier is for broadcast to other devices using BLE and changes
@@ -447,7 +492,7 @@ void contrac_get_proximity_id_base64(Contrac const * data, char * base64) {
 }
 
 /**
- * Update the Daily Tracing Key and Random Proxmity Identifer.
+ * Updates the Daily Tracing Key and Random Proxmity Identifer.
  *
  * The Daily Tracing Key changes every day, the Random Proximity Identifier
  * changes every 10 minutes.

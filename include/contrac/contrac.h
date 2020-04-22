@@ -67,6 +67,8 @@ bool contrac_set_day_number(Contrac * data, uint32_t day_number);
 bool contrac_set_time_interval_number(Contrac * data, uint8_t time_interval_number);
 bool contrac_update_current_time(Contrac * data);
 bool contrac_get_initialised(Contrac const * data);
+uint32_t contrac_get_day_number(Contrac * data);
+uint8_t contrac_get_time_interval_number(Contrac * data);
 
 unsigned char const * contrac_get_tracing_key(Contrac const * data);
 void contrac_get_tracing_key_base64(Contrac const * data, char * base64);
