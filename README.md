@@ -6,14 +6,20 @@ See the draft specs: https://www.apple.com/covid19/contacttracing/
 
 ## Install
 
-If you have autoconf you can install as follows.
+If you have autoconf you can install like this:
 
 ```
 autoreconf --install
 ./configure
 make
-make check
 make install
+```
+
+You can also run the unit tests and build the
+[documentation](https://www.flypig.co.uk/docs/libcontrac/):
+```
+make check
+make doxygen
 ```
 
 ## Usage
@@ -99,9 +105,11 @@ libcontrac is released under the GPL v2 Licence. Read COPYING for information on
 
 ## Contact and Links
 
-More information can be found at: https://www.flypig.co.uk/contrac
+Library home page: https://www.flypig.co.uk/contrac
 
-The source code can be obtained from git:
+API documentation: https://www.flypig.co.uk/docs/libcontrac/
+
+Source code from git:
 ```
 git clone git@www.flypig.org.uk:libcontrac
 ```
